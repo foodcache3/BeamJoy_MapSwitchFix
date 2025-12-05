@@ -1,3 +1,6 @@
+A fix created for server hosters such as Horizon Hosting that overwrite the ServerConfig.toml on a server restart, preventing a modded map from loading from the in-game map switcher. 
+Caveat for the fix is that the modded map needs to be staged within the Resources/Client folder since the last server restart.
+
 # BeamJoy
 All-in-One mod for BeamMP
 

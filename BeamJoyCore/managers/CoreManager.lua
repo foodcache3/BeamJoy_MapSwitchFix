@@ -100,21 +100,10 @@ local function setMap(mapName)
         return false
     end
 
-    if currentMap and currentMap.custom then
-        -- move map mod out of folder
-        local targetPath = string.var("{1}Client/{2}", { resourcesFolderPath, currentMap.archive })
-        if FS.Exists(targetPath) then
-            FS.Remove(targetPath)
-        end
-    end
-
+    -- Verify custom map is in Client folder if needed
     if targetMap and targetMap.custom then
-        -- move map mod into folder
-        local sourcePath = string.var("{1}{2}", { resourcesFolderPath, targetMap.archive })
-        if FS.Exists(sourcePath) then
-            local targetPath = string.var("{1}Client/{2}", { resourcesFolderPath, targetMap.archive })
-            FS.Copy(sourcePath, targetPath)
-        else
+        local targetPath = string.var("{1}Client/{2}", { resourcesFolderPath, targetMap.archive })
+        if not FS.Exists(targetPath) then
             error({ key = "mapSwitch.missingArchive" })
         end
     end
@@ -130,16 +119,8 @@ local function setMap(mapName)
         return messagesCache[player.lang]:var({ delay = PrettyDelay(delaySec) })
     end, "mapSwitch.kick", function()
         _set("Map", newFullName)
-
-        if currentMap and targetMap and
-            (currentMap.custom or targetMap.custom) and
-            targetMap.archive ~= currentMap.archive then
-            -- if current or target is custom and not from the same mod, a reboot is mandatory
-            LogWarn("Map switch requires a reboot, restarting now...")
-            Exit()
-        else
-            BJCScenarioData.reload()
-        end
+        -- No reboot needed since all custom maps are already in Client folder
+        BJCScenarioData.reload()
     end)
     return true
 end
@@ -148,7 +129,7 @@ local function consoleSetMap(args)
     local maps = {}
     for mapName, map in pairs(BJCMaps.Data) do
         if map.enabled then
-            table.insert(maps, tostring(mapName))
+            table.insert(maps, mapName)
         end
     end
     table.sort(maps, function(a, b) return a:lower() < b:lower() end)
